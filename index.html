@@ -3,178 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Global Connect - Executive Infinite v5</title>
+    <title>Global Connect - Executive Final</title>
     <style>
         :root { --bg: #FDFBF7; --navy: #1A2A6C; --gold: #C5A059; --text: #2C3E50; }
-        body { font-family: 'Times New Roman', serif; background: var(--bg); margin: 0; display: flex; justify-content: center; color: var(--text); overflow: hidden; }
+        body { font-family: 'Times New Roman', serif; background: var(--bg); margin: 0; display: flex; justify-content: center; height: 100vh; color: var(--text); overflow: hidden; }
         .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; background: var(--bg); height: 100vh; }
         .header { padding: 20px; text-align: center; background: var(--navy); color: var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .header h1 { margin: 0; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
-        
         .main-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
-        
         .voice-mode-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 5px; }
-        .gender-option { font-size: 13px; font-weight: bold; cursor: pointer; padding: 10px 20px; border-radius: 20px; border: 1px solid #ddd; background: #fff; transition: 0.3s; }
+        .gender-option { font-size: 13px; font-weight: bold; cursor: pointer; padding: 10px 20px; border-radius: 20px; border: 1px solid #ddd; background: #fff; }
         .gender-option.active { background: var(--navy); color: var(--gold); border-color: var(--navy); }
-
-        .controls { display: grid; grid-template-columns: 2fr 1.2fr; gap: 10px; }
-        .mic-btn { padding: 18px; border-radius: 40px; border: none; background: linear-gradient(135deg, var(--navy), #2a3a7c); color: var(--gold); font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 5px 10px rgba(26,42,108,0.2); }
+        .mic-btn { width: 100%; padding: 18px; border-radius: 40px; border: none; background: linear-gradient(135deg, var(--navy), #2a3a7c); color: var(--gold); font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 10px rgba(26,42,108,0.2); }
         .mic-btn.active { background: #B21F1F; color: #fff; animation: pulse 1.5s infinite; }
-        .stop-btn { padding: 18px; border-radius: 40px; border: 2px solid var(--gold); background: #fff; color: var(--navy); font-size: 14px; font-weight: bold; cursor: pointer; display: none; align-items: center; justify-content: center; gap: 5px; }
-
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(178, 31, 31, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0); }
-        }
-
+        .stop-btn { padding: 18px; border-radius: 40px; border: 2px solid var(--gold); background: #fff; color: var(--navy); font-size: 14px; font-weight: bold; cursor: pointer; display: none; align-items: center; justify-content: center; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(178, 31, 31, 0); } 100% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0); } }
         .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #E8E2D6; }
-        .label { font-size: 10px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: bold; font-family: sans-serif; }
-        #capturedText { font-size: 18px; line-height: 1.6; min-height: 80px; color: var(--text); max-height: 150px; overflow-y: auto; }
-
+        .label { font-size: 10px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: bold; }
+        #capturedText { font-size: 18px; line-height: 1.6; min-height: 60px; color: var(--text); max-height: 120px; overflow-y: auto; }
         .selector-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .lang-btn { padding: 15px 5px; border-radius: 10px; border: 1px solid #D1C7B7; background: #F9F7F2; color: var(--navy); font-weight: bold; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .lang-btn:active { background: var(--gold); color: white; }
-        .lang-btn span { font-size: 24px; }
-
-        .result-card { border-top: 3px solid var(--gold); flex-grow: 1; display: flex; flex-direction: column; min-height: 150px; }
-        #translatedDisplay { font-size: 22px; font-weight: 600; color: var(--navy); line-height: 1.4; flex-grow: 1; overflow-y: auto; }
+        .result-card { border-top: 3px solid var(--gold); flex-grow: 1; min-height: 150px; }
+        #translatedDisplay { font-size: 22px; font-weight: 600; color: var(--navy); line-height: 1.4; }
         .footer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; border-top: 1px solid #F0EAE0; padding-top: 10px; }
         .audio-btn { background: var(--gold); color: #fff; border: none; padding: 12px 30px; border-radius: 40px; font-weight: bold; cursor: pointer; }
-        .status-text { font-size: 10px; color: #A09686; }
     </style>
 </head>
 <body>
 <div class="app-container">
     <div class="header"><h1>GLOBAL CONNECT</h1></div>
     <div class="main-content">
-        <div class="voice-mode-selector">
-            <div id="maleOpt" class="gender-option active" onclick="setGender('male')">👨 男性</div>
-            <div id="femaleOpt" class="gender-option" onclick="setGender('female')">👩 女性</div>
-        </div>
-
-        <div class="controls">
+        <div class="voice-mode-selector"><div id="maleOpt" class="gender-option active" onclick="setGender('male')">👨 男性</div><div id="femaleOpt" class="gender-option" onclick="setGender('female')">👩 女性</div></div>
+        <div style="display:grid; grid-template-columns: 2fr 1fr; gap:10px;">
             <button id="micBtn" class="mic-btn">🎙️ <span id="micText">SPEAK</span></button>
             <button id="stopBtn" class="stop-btn">🛑 STOP</button>
         </div>
-
-        <div class="card">
-            <span class="label">Input (Accumulated)</span>
-            <div id="capturedText">....</div>
-            <button onclick="clearText()" style="font-size:10px; margin-top:10px; background:none; border:1px solid #ccc; border-radius:4px; color:#999; cursor:pointer;">クリア</button>
-        </div>
-
-        <div class="card">
-            <span class="label">Translate to</span>
-            <div class="selector-grid">
-                <button class="lang-btn" onclick="requestTranslation('ja')"><span>🇯🇵</span> JAPANESE</button>
-                <button class="lang-btn" onclick="requestTranslation('vi')"><span>🇻🇳</span> VIETNAM</button>
-                <button class="lang-btn" onclick="requestTranslation('en')"><span>🇺🇸</span> ENGLISH</button>
-            </div>
-        </div>
-
-        <div class="card result-card">
-            <span class="label">Translation</span>
-            <div id="translatedDisplay">....</div>
-            <div class="footer-actions">
-                <span id="statusBadge" class="status-text">SYSTEM READY</span>
-                <button class="audio-btn" onclick="repeatVoice()">🔊 REPLAY</button>
-            </div>
-        </div>
+        <div class="card"><span class="label">Input</span><div id="capturedText">....</div><button onclick="clearText()" style="font-size:10px; margin-top:5px; border:1px solid #ccc; background:none; cursor:pointer;">クリア</button></div>
+        <div class="card"><span class="label">Translate to</span><div class="selector-grid">
+            <button class="lang-btn" onclick="requestTranslation('ja')"><span>🇯🇵</span> JAPANESE</button>
+            <button class="lang-btn" onclick="requestTranslation('vi')"><span>🇻🇳</span> VIETNAM</button>
+            <button class="lang-btn" onclick="requestTranslation('en')"><span>🇺🇸</span> ENGLISH</button>
+        </div></div>
+        <div class="card result-card"><span class="label">Translation</span><div id="translatedDisplay">....</div><div class="footer-actions"><span id="statusBadge" style="font-size:10px; color:#A09686;">READY</span><button class="audio-btn" onclick="repeatVoice()">🔊 REPLAY</button></div></div>
     </div>
 </div>
-
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycby_T8EAdI7du4c7GwRnVZcHUh2yje_j5Cp79C8XGtPqSw7GpTKTfA0oLJ6TK8TbGesiZQ/exec";
-    const micBtn = document.getElementById('micBtn');
-    const stopBtn = document.getElementById('stopBtn');
-    const capturedText = document.getElementById('capturedText');
-    const translatedDisplay = document.getElementById('translatedDisplay');
-    const statusBadge = document.getElementById('statusBadge');
-    
-    let lastTranslatedText = "", lastLang = "", selectedGender = 'male';
-    let recognition;
-    let finalTranscript = ''; // これまでの言葉を貯めておく変数
+    const micBtn = document.getElementById('micBtn'), stopBtn = document.getElementById('stopBtn'), capturedText = document.getElementById('capturedText'), translatedDisplay = document.getElementById('translatedDisplay'), statusBadge = document.getElementById('statusBadge');
+    let lastTranslatedText = "", lastLang = "", selectedGender = 'male', recognition, finalTranscript = '';
 
-    function setGender(gender) {
-        selectedGender = gender;
-        document.getElementById('maleOpt').classList.toggle('active', gender === 'male');
-        document.getElementById('femaleOpt').classList.toggle('active', gender === 'female');
-    }
-
-    function clearText() {
-        finalTranscript = '';
-        capturedText.innerText = '....';
-    }
+    function setGender(g) { selectedGender = g; document.getElementById('maleOpt').classList.toggle('active', g === 'male'); document.getElementById('femaleOpt').classList.toggle('active', g === 'female'); }
+    function clearText() { finalTranscript = ''; capturedText.innerText = '....'; }
 
     if (window.webkitSpeechRecognition || window.SpeechRecognition) {
         const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
         recognition = new SpeechRecognition();
         recognition.interimResults = true;
         recognition.continuous = true;
-
-        recognition.onresult = (event) => {
-            let interimTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                const transcript = event.results[i][0].transcript;
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript;
-                } else {
-                    interimTranscript += transcript;
-                }
+        recognition.onresult = (e) => {
+            let interim = '';
+            for (let i = e.resultIndex; i < e.results.length; ++i) {
+                if (e.results[i].isFinal) { finalTranscript += e.results[i][0].transcript; }
+                else { interim += e.results[i][0].transcript; }
             }
-            // 確定した分 ＋ 今話している最中の分 を表示
-            capturedText.innerText = finalTranscript + interimTranscript;
+            capturedText.innerText = finalTranscript + interim;
         };
-
-        recognition.onend = () => {
-            // 勝手に止まっても、もしボタンが「アクティブ」のままなら再開させる
-            if (micBtn.classList.contains('active')) {
-                recognition.start();
-            }
-        };
+        recognition.onend = () => { if (micBtn.classList.contains('active')) recognition.start(); };
     }
 
     micBtn.onclick = () => {
-        clearText(); // 新しく話し始める時にクリア
+        clearText();
         recognition.lang = (lastLang === 'vi') ? 'vi-VN' : (lastLang === 'en') ? 'en-US' : 'ja-JP';
-        try {
-            recognition.start();
-            micBtn.classList.add('active');
-            stopBtn.style.display = "flex";
-            document.getElementById('micText').innerText = "LISTENING...";
-            statusBadge.innerText = "ACTIVE";
-        } catch (e) { console.error(e); }
+        recognition.start(); micBtn.classList.add('active'); stopBtn.style.display = "flex"; document.getElementById('micText').innerText = "LISTENING...";
     };
 
-    stopBtn.onclick = () => {
-        micBtn.classList.remove('active');
-        recognition.stop();
-        stopBtn.style.display = "none";
-        document.getElementById('micText').innerText = "SPEAK";
-        statusBadge.innerText = "CAPTURED";
-    };
+    stopBtn.onclick = () => { micBtn.classList.remove('active'); recognition.stop(); stopBtn.style.display = "none"; document.getElementById('micText').innerText = "SPEAK"; };
 
-    function requestTranslation(targetLang) {
+    function requestTranslation(target) {
         const text = capturedText.innerText;
         if (!text || text === "....") return;
         statusBadge.innerText = "CONNECTING...";
-        translatedDisplay.style.opacity = "0.4";
-        
-        const callbackName = 'cb_' + Math.round(100000 * Math.random());
-        window[callbackName] = function(data) {
-            lastTranslatedText = data.result;
-            lastLang = targetLang;
-            translatedDisplay.innerText = lastTranslatedText;
-            translatedDisplay.style.opacity = "1";
-            statusBadge.innerText = "COMPLETED";
-            repeatVoice();
-            delete window[callbackName];
-            document.body.removeChild(script);
+        const cb = 'cb_' + Date.now();
+        window[cb] = (data) => {
+            lastTranslatedText = data.result; lastLang = target;
+            translatedDisplay.innerText = lastTranslatedText; statusBadge.innerText = "DONE";
+            repeatVoice(); delete window[cb]; document.body.removeChild(script);
         };
-
         const script = document.createElement('script');
-        script.src = `${GAS_URL}?text=${encodeURIComponent(text)}&target=${targetLang}&callback=${callbackName}`;
+        script.src = `${GAS_URL}?text=${encodeURIComponent(text)}&target=${target}&callback=${cb}`;
         document.body.appendChild(script);
     }
 
@@ -182,17 +98,15 @@
         if (!lastTranslatedText) return;
         window.speechSynthesis.cancel();
         const uttr = new SpeechSynthesisUtterance(lastTranslatedText);
-        uttr.lang = (lastLang === 'vi') ? 'vi-VN' : (lastLang === 'ja') ? 'ja-JP' : (lastLang === 'en') ? 'en-US' : 'ja-JP';
-        
+        uttr.lang = (lastLang === 'vi') ? 'vi-VN' : (lastLang === 'ja') ? 'ja-JP' : 'en-US';
         const voices = window.speechSynthesis.getVoices();
-        const voice = voices.find(v => {
-            const isLang = v.lang.startsWith(uttr.lang.split('-')[0]);
-            const name = v.name.toLowerCase();
-            return selectedGender === 'female' ? (isLang && (name.includes('female') || name.includes('woman') || name.includes('girl') || name.includes('kyoko'))) : (isLang && (name.includes('male') || name.includes('man') || name.includes('boy')));
+        const v = voices.find(v => {
+            const isL = v.lang.startsWith(uttr.lang.split('-')[0]);
+            const n = v.name.toLowerCase();
+            return selectedGender === 'female' ? (isL && (n.includes('female') || n.includes('woman') || n.includes('kyoko'))) : (isL && (n.includes('male') || n.includes('man')));
         });
-        if (voice) uttr.voice = voice;
-        uttr.rate = 0.92;
-        window.speechSynthesis.speak(uttr);
+        if (v) uttr.voice = v;
+        uttr.rate = 0.92; window.speechSynthesis.speak(uttr);
     }
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 </script>
