@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Global Connect - Executive</title>
+    <title>Global Connect - Executive Final</title>
     <style>
         :root { --bg: #FDFBF7; --navy: #1A2A6C; --gold: #C5A059; --accent: #B21F1F; }
-        body { font-family: 'Times New Roman', serif; background: var(--bg); margin: 0; display: flex; justify-content: center; height: 100vh; overflow: hidden; color: #2C3E50; }
+        body { font-family: serif; background: var(--bg); margin: 0; display: flex; justify-content: center; height: 100vh; overflow: hidden; color: #2C3E50; }
         .app { width: 100%; max-width: 480px; display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; height: 100vh; }
         .header { background: var(--navy); color: var(--gold); padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 12px; font-weight: bold; letter-spacing: 2px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 2px solid var(--gold); }
         .controls { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 12px; }
@@ -15,16 +15,16 @@
         .mic-btn.active { background: #333; color: #fff; animation: pulse 1.5s infinite; }
         .stop-btn { background: var(--accent); color: white; display: none; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
-        .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #E8E2D6; margin-bottom: 10px; }
+        .card { background: #fff; border-radius: 12px; padding: 15px; border: 1px solid #E8E2D6; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .label { font-size: 10px; color: var(--gold); font-weight: bold; margin-bottom: 5px; display: block; text-transform: uppercase; }
-        #capturedText { font-size: 18px; min-height: 50px; color: #333; line-height: 1.5; }
+        #capturedText { font-size: 18px; line-height: 1.6; min-height: 50px; color: #333; }
         .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .lang-btn { background: #F9F7F2; border: 1px solid #D1C7B7; color: var(--navy); padding: 12px 5px; border-radius: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; gap: 5px; }
         .lang-btn span { font-size: 28px; }
         .result-card { border-top: 4px solid var(--gold); flex-grow: 1; display: flex; flex-direction: column; }
         #translatedDisplay { font-size: 24px; font-weight: bold; color: var(--navy); line-height: 1.4; flex-grow: 1; overflow-y: auto; }
         .footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #F0EAE0; }
-        .audio-btn { background: var(--gold); color: white; border: none; padding: 12px 35px; border-radius: 40px; font-weight: bold; }
+        .audio-btn { background: var(--gold); color: white; border: none; padding: 12px 35px; border-radius: 40px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -34,7 +34,7 @@
         <button id="micBtn" class="btn mic-btn">🎙️ SPEAK</button>
         <button id="stopBtn" class="btn stop-btn">🛑 STOP</button>
     </div>
-    <div class="card"><span class="label">INPUT</span><div id="capturedText">....</div></div>
+    <div class="card"><span class="label">INPUT</span><div id="capturedText">....</div><button onclick="clearT()" style="font-size:10px; margin-top:5px; border:1px solid #ccc; background:none; cursor:pointer; padding:2px 8px; border-radius:4px;">クリア</button></div>
     <div class="card"><span class="label">TRANSLATE TO</span>
         <div class="grid">
             <button class="lang-btn" onclick="go('ja')"><span>🇯🇵</span> JAPAN</button>
@@ -44,13 +44,15 @@
     </div>
     <div class="card result-card">
         <span class="label">TRANSLATION</span><div id="translatedDisplay">....</div>
-        <div class="footer"><span id="st" style="font-size:10px; color:#999;">READY</span><button class="audio-btn" onclick="replay()">🔊 REPLAY</button></div>
+        <div class="footer"><span id="st" style="font-size:10px; color:#A09686;">READY</span><button class="audio-btn" onclick="replay()">🔊 REPLAY</button></div>
     </div>
 </div>
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycby_T8EAdI7du4c7GwRnVZcHUh2yje_j5Cp79C8XGtPqSw7GpTKTfA0oLJ6TK8TbGesiZQ/exec";
     const micBtn = document.getElementById('micBtn'), stopBtn = document.getElementById('stopBtn'), capturedText = document.getElementById('capturedText'), translatedDisplay = document.getElementById('translatedDisplay'), st = document.getElementById('st');
     let lastT = "", lastL = "", recognition, finalT = '';
+
+    function clearT() { finalT = ''; capturedText.innerText = '....'; }
 
     const SR = window.webkitSpeechRecognition || window.SpeechRecognition;
     recognition = new SR(); recognition.interimResults = true; recognition.continuous = true;
@@ -65,14 +67,11 @@
     recognition.onend = () => { if (micBtn.classList.contains('active')) recognition.start(); };
 
     micBtn.onclick = () => {
-        finalT = ''; capturedText.innerText = '....';
-        recognition.lang = (lastL === 'vi') ? 'vi-VN' : (lastL === 'en') ? 'en-US' : 'ja-JP';
+        clearT(); recognition.lang = (lastL === 'vi') ? 'vi-VN' : (lastL === 'en') ? 'en-US' : 'ja-JP';
         recognition.start(); micBtn.classList.add('active'); stopBtn.style.display = "flex";
     };
 
-    stopBtn.onclick = () => {
-        micBtn.classList.remove('active'); recognition.stop(); stopBtn.style.display = "none";
-    };
+    stopBtn.onclick = () => { micBtn.classList.remove('active'); recognition.stop(); stopBtn.style.display = "none"; };
 
     function go(L) {
         const text = capturedText.innerText;
@@ -83,13 +82,13 @@
             lastT = data.result; lastL = L;
             translatedDisplay.innerText = lastT; st.innerText = "DONE";
             replay(); delete window.cb;
-            if(document.getElementById('api')) document.getElementById('api').remove();
+            const s = document.getElementById('jsonp'); if (s) s.remove();
         };
 
-        const s = document.createElement('script');
-        s.id = 'api';
-        s.src = GAS_URL + "?text=" + encodeURIComponent(text) + "&target=" + L + "&callback=cb";
-        document.body.appendChild(s);
+        const script = document.createElement('script');
+        script.id = 'jsonp';
+        script.src = GAS_URL + "?text=" + encodeURIComponent(text) + "&target=" + L + "&callback=cb";
+        document.body.appendChild(script);
     }
 
     function replay() {
