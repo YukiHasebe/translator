@@ -94,20 +94,39 @@
         document.body.appendChild(script);
     }
 
-    function repeatVoice() {
+        function repeatVoice() {
         if (!lastTranslatedText) return;
         window.speechSynthesis.cancel();
+        
         const uttr = new SpeechSynthesisUtterance(lastTranslatedText);
-        uttr.lang = (lastLang === 'vi') ? 'vi-VN' : (lastLang === 'ja') ? 'ja-JP' : 'en-US';
+        
+        // 言語コードをより厳格に指定（なまりを防止）
+        if (lastLang === 'vi') {
+            uttr.lang = 'vi-VN';
+        } else if (lastLang === 'en') {
+            uttr.lang = 'en-US';
+        } else {
+            uttr.lang = 'ja-JP';
+        }
+
         const voices = window.speechSynthesis.getVoices();
-        const v = voices.find(v => {
-            const isL = v.lang.startsWith(uttr.lang.split('-')[0]);
-            const n = v.name.toLowerCase();
-            return selectedGender === 'female' ? (isL && (n.includes('female') || n.includes('woman') || n.includes('kyoko'))) : (isL && (n.includes('male') || n.includes('man')));
+        const targetVoice = voices.find(v => {
+            const isLang = v.lang.startsWith(uttr.lang.split('-')[0]);
+            const name = v.name.toLowerCase();
+            // 性別を反映させる指定
+            if (selectedGender === 'female') {
+                return isLang && (name.includes('female') || name.includes('woman') || name.includes('kyoko'));
+            } else {
+                return isLang && (name.includes('male') || name.includes('man'));
+            }
         });
-        if (v) uttr.voice = v;
-        uttr.rate = 0.92; window.speechSynthesis.speak(uttr);
+
+        if (targetVoice) uttr.voice = targetVoice;
+        uttr.rate = 0.92;
+        window.speechSynthesis.speak(uttr);
     }
+
+    // iPhoneが音声を準備するための待機命令
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 </script>
 </body>
