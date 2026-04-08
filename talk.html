@@ -3,122 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Global Connect - Final Alpha</title>
+    <title>Global Connect - Executive Edition</title>
     <style>
-        :root { --bg: #FDFBF7; --navy: #1A2A6C; --gold: #C5A059; --text: #2C3E50; }
-        body { font-family: serif; background: var(--bg); margin: 0; display: flex; justify-content: center; height: 100vh; color: var(--text); overflow: hidden; }
-        .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; background: var(--bg); height: 100vh; }
-        .header { padding: 25px; text-align: center; background: var(--navy); color: var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 2px solid var(--gold); }
-        .header h1 { margin: 0; font-size: 22px; letter-spacing: 4px; text-transform: uppercase; font-weight: bold; }
-        .main-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
-        .card { background: #fff; border-radius: 16px; padding: 18px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #E8E2D6; }
-        .label { font-size: 11px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: bold; font-family: sans-serif; letter-spacing: 1px; }
-        #capturedText { font-size: 18px; line-height: 1.6; min-height: 50px; color: var(--text); }
-        .controls { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin: 5px 0; }
-        .mic-btn { padding: 20px; border-radius: 50px; border: none; background: linear-gradient(135deg, var(--navy), #2a3a7c); color: var(--gold); font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 5px 15px rgba(26,42,108,0.3); }
-        .mic-btn.active { background: #B21F1F; color: #fff; animation: pulse 1s infinite; }
-        .stop-btn { padding: 20px; border-radius: 50px; border: 2px solid var(--gold); background: #fff; color: var(--navy); font-size: 15px; font-weight: bold; cursor: pointer; display: none; align-items: center; justify-content: center; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
-        .selector-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .lang-btn { padding: 18px 5px; border-radius: 12px; border: 1px solid #D1C7B7; background: #F9F7F2; color: var(--navy); font-weight: bold; font-size: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .lang-btn:active { background: var(--gold); color: #fff; }
+        :root { --bg: #FDFBF7; --navy: #1A2A6C; --gold: #C5A059; --accent: #B21F1F; }
+        body { font-family: 'Times New Roman', serif; background: var(--bg); margin: 0; display: flex; justify-content: center; height: 100vh; overflow: hidden; color: #2C3E50; }
+        .app { width: 100%; max-width: 480px; display: flex; flex-direction: column; padding: 15px; box-sizing: border-box; height: 100vh; }
+        .header { background: var(--navy); color: var(--gold); padding: 20px; text-align: center; border-radius: 12px; margin-bottom: 12px; font-weight: bold; letter-spacing: 3px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-bottom: 2px solid var(--gold); }
+        
+        /* 操作ボタン */
+        .controls { display: grid; grid-template-columns: 2fr 1.2fr; gap: 10px; margin-bottom: 12px; }
+        .mic-btn { padding: 18px; border-radius: 40px; border: none; background: linear-gradient(135deg, var(--navy), #2a3a7c); color: var(--gold); font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 5px 15px rgba(26,42,108,0.3); }
+        .mic-btn.active { animation: blink 1.5s infinite; background: #333; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .stop-btn { padding: 18px; border-radius: 40px; border: none; background: var(--accent); color: white; font-size: 14px; font-weight: bold; cursor: pointer; display: none; align-items: center; justify-content: center; gap: 5px; box-shadow: 0 5px 10px rgba(178,31,31,0.2); }
+
+        .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #E8E2D6; margin-bottom: 10px; }
+        .label { font-size: 10px; color: var(--gold); font-weight: bold; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 1px; }
+        #capturedText { font-size: 18px; line-height: 1.6; min-height: 50px; color: #333; }
+        
+        /* 国旗付きボタン */
+        .grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+        .lang-btn { background: #F9F7F2; border: 1px solid #D1C7B7; color: var(--navy); font-size: 11px; padding: 12px 5px; border-radius: 10px; font-weight: bold; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .lang-btn:active { background: var(--gold); color: white; }
         .lang-btn span { font-size: 28px; }
-        .result-card { border-top: 4px solid var(--gold); flex-grow: 1; min-height: 150px; }
-        #translatedDisplay { font-size: 24px; font-weight: 600; color: var(--navy); line-height: 1.4; }
-        .footer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid #F0EAE0; padding-top: 15px; }
-        .audio-btn { background: var(--gold); color: #fff; border: none; padding: 12px 35px; border-radius: 50px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(197,160,89,0.3); }
+
+        .result-card { border-top: 4px solid var(--gold); flex-grow: 1; min-height: 120px; display: flex; flex-direction: column; }
+        #translatedDisplay { font-size: 24px; font-weight: bold; color: var(--navy); line-height: 1.4; flex-grow: 1; overflow-y: auto; }
+        
+        .footer { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; border-top: 1px solid #F0EAE0; }
+        .audio-btn { background: var(--gold); color: white; border: none; padding: 12px 35px; border-radius: 40px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(197,160,89,0.3); }
+        .status { font-size: 10px; color: #A09686; text-align: center; }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <div class="header"><h1>GLOBAL CONNECT</h1></div>
-    <div class="main-content">
-        <div class="controls">
-            <button id="micBtn" class="mic-btn">🎙️ <span id="micText">SPEAK</span></button>
-            <button id="stopBtn" class="stop-btn">🛑 STOP</button>
+<div class="app">
+    <div class="header">GLOBAL CONNECT</div>
+    
+    <div class="controls">
+        <button id="micBtn" class="mic-btn">🎙️ SPEAK</button>
+        <button id="stopBtn" class="stop-btn">🛑 STOP</button>
+    </div>
+
+    <div class="card">
+        <span class="label">INPUT</span>
+        <div id="capturedText">....</div>
+        <button onclick="clearT()" style="font-size:10px; margin-top:10px; border:1px solid #ccc; background:none; color:#999; padding:2px 8px; border-radius:4px;">クリア</button>
+    </div>
+
+    <div class="card">
+        <span class="label">TRANSLATE TO</span>
+        <div class="grid">
+            <button class="lang-btn" onclick="translateTo('ja')"><span>🇯🇵</span> JAPAN</button>
+            <button class="lang-btn" onclick="translateTo('vi')"><span>🇻🇳</span> VIETNAM</button>
+            <button class="lang-btn" onclick="requestEnglish()"><span>🇺🇸</span> ENGLISH</button>
         </div>
-        <div class="card"><span class="label">Input</span><div id="capturedText">....</div><button onclick="clearText()" style="font-size:10px; margin-top:10px; border:1px solid #ccc; background:none; color:#999; cursor:pointer; padding:2px 8px; border-radius:4px;">クリア</button></div>
-        <div class="card"><span class="label">Translate to</span><div class="selector-grid">
-            <button class="lang-btn" onclick="requestTranslation('ja')"><span>🇯🇵</span> JAPAN</button>
-            <button class="lang-btn" onclick="requestTranslation('vi')"><span>🇻🇳</span> VIETNAM</button>
-            <button class="lang-btn" onclick="requestTranslation('en')"><span>🇺🇸</span> ENGLISH</button>
-        </div></div>
-        <div class="card result-card"><span class="label">Translation</span><div id="translatedDisplay">....</div><div class="footer-actions"><span id="statusBadge" style="font-size:11px; color:#A09686;">SYSTEM READY</span><button class="audio-btn" onclick="repeatVoice()">🔊 REPLAY</button></div></div>
+    </div>
+
+    <div class="card result-card">
+        <span class="label">TRANSLATION</span>
+        <div id="translatedDisplay">....</div>
+        <div class="footer">
+            <span id="st" class="status">READY</span>
+            <button class="audio-btn" onclick="replay()">🔊 REPLAY</button>
+        </div>
     </div>
 </div>
+
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycby_T8EAdI7du4c7GwRnVZcHUh2yje_j5Cp79C8XGtPqSw7GpTKTfA0oLJ6TK8TbGesiZQ/exec";
-    const micBtn = document.getElementById('micBtn'), stopBtn = document.getElementById('stopBtn'), capturedText = document.getElementById('capturedText'), translatedDisplay = document.getElementById('translatedDisplay'), statusBadge = document.getElementById('statusBadge');
-    let lastTranslatedText = "", lastLang = "", recognition, finalTranscript = '';
+    const micBtn = document.getElementById('micBtn'), stopBtn = document.getElementById('stopBtn'), capturedText = document.getElementById('capturedText'), translatedDisplay = document.getElementById('translatedDisplay'), st = document.getElementById('st');
+    let lastT = "", lastL = "", recognition, currentFinal = '';
 
-    function clearText() { finalTranscript = ''; capturedText.innerText = '....'; }
+    function clearT() { currentFinal = ''; capturedText.innerText = '....'; }
 
-    if (window.webkitSpeechRecognition || window.SpeechRecognition) {
-        const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-        recognition = new SpeechRecognition();
-        recognition.interimResults = true;
-        recognition.continuous = true;
-        recognition.onresult = (e) => {
-            let interim = '';
-            for (let i = e.resultIndex; i < e.results.length; ++i) {
-                if (e.results[i].isFinal) finalTranscript += e.results[i][0].transcript;
-                else interim += e.results[i][0].transcript;
-            }
-            capturedText.innerText = finalTranscript + interim;
-        };
-        recognition.onend = () => { if (micBtn.classList.contains('active')) recognition.start(); };
-    }
+    const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.interimResults = true;
+    recognition.continuous = true;
 
-    micBtn.onclick = () => {
-        clearText();
-        recognition.lang = (lastLang === 'vi') ? 'vi-VN' : (lastLang === 'en') ? 'en-US' : 'ja-JP';
-        recognition.start(); micBtn.classList.add('active'); stopBtn.style.display = "flex"; document.getElementById('micText').innerText = "LISTENING...";
+    recognition.onresult = (e) => {
+        let interim = '';
+        for (let i = e.resultIndex; i < e.results.length; ++i) {
+            if (e.results[i].isFinal) currentFinal += e.results[i][0].transcript;
+            else interim += e.results[i][0].transcript;
+        }
+        capturedText.innerText = currentFinal + interim;
     };
 
-    stopBtn.onclick = () => { micBtn.classList.remove('active'); recognition.stop(); stopBtn.style.display = "none"; document.getElementById('micText').innerText = "SPEAK"; };
+    recognition.onend = () => { if (micBtn.classList.contains('active')) recognition.start(); };
 
-    function requestTranslation(target) {
+    micBtn.onclick = () => {
+        clearT();
+        recognition.lang = (lastL === 'vi') ? 'vi-VN' : (lastL === 'en') ? 'en-US' : 'ja-JP';
+        try {
+            recognition.start();
+            micBtn.classList.add('active');
+            stopBtn.style.display = "flex";
+            micBtn.innerText = "🎙️ LISTENING...";
+            st.innerText = "ACTIVE";
+        } catch (err) {}
+    };
+
+    stopBtn.onclick = () => {
+        micBtn.classList.remove('active');
+        recognition.stop();
+        stopBtn.style.display = "none";
+        micBtn.innerText = "🎙️ SPEAK";
+        st.innerText = "CAPTURED";
+    };
+
+    function translateTo(lang) {
         const text = capturedText.innerText;
         if (!text || text === "....") return;
-        statusBadge.innerText = "CONNECTING...";
-        const cb = 'cb_' + Date.now();
-        window[cb] = (data) => {
-            lastTranslatedText = data.result; lastLang = target;
-            translatedDisplay.innerText = lastTranslatedText; statusBadge.innerText = "COMPLETED";
-            repeatVoice(); delete window[cb]; document.body.removeChild(script);
+        st.innerText = "CONNECTING...";
+        
+        window.cb = (data) => {
+            lastT = data.result; lastL = lang;
+            translatedDisplay.innerText = lastT; st.innerText = "DONE";
+            replay();
+            const old = document.getElementById('api-script');
+            if (old) old.remove();
+            delete window.cb;
         };
+
         const script = document.createElement('script');
-        script.src = `${GAS_URL}?text=${encodeURIComponent(text)}&target=${target}&callback=${cb}`;
+        script.id = 'api-script';
+        script.src = `${GAS_URL}?text=${encodeURIComponent(text)}&target=${lang}&callback=cb`;
         document.body.appendChild(script);
     }
 
-    function repeatVoice() {
-        if (!lastTranslatedText) return;
-        
-        // 再生を一旦クリア
+    function requestEnglish() { translateTo('en'); }
+
+    function replay() {
+        if (!lastT) return;
         window.speechSynthesis.cancel();
-
         setTimeout(() => {
-            const uttr = new SpeechSynthesisUtterance(lastTranslatedText);
-            
-            // 言語タグを強制指定
-            if (lastLang === 'vi') uttr.lang = 'vi-VN';
-            else if (lastLang === 'en') uttr.lang = 'en-US';
-            else uttr.lang = 'ja-JP';
-
-            // iPhoneが利用可能な音声リストから、無理やりその言語の声を選ばせる
+            const uttr = new SpeechSynthesisUtterance(lastT);
+            uttr.lang = (lastL === 'vi') ? 'vi-VN' : (lastL === 'en') ? 'en-US' : 'ja-JP';
             const voices = window.speechSynthesis.getVoices();
             const voice = voices.find(v => v.lang.startsWith(uttr.lang.split('-')[0]));
             if (voice) uttr.voice = voice;
-
-            uttr.rate = 0.92;
+            uttr.rate = 0.9;
             window.speechSynthesis.speak(uttr);
-        }, 100); // 0.1秒待ってから再生（iPhoneのバグ回避）
+        }, 200);
     }
-
-    // 初回読み込み時に音声を準備
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
-    window.speechSynthesis.getVoices();
 </script>
 </body>
 </html>
