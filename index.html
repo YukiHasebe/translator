@@ -3,89 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Global Connect - Executive Final</title>
+    <title>Global Connect - Executive Infinite</title>
     <style>
-        :root {
-            --bg-base: #FDFBF7;
-            --navy-deep: #1A2A6C;
-            --gold-accent: #C5A059;
-            --text-main: #2C3E50;
-            --card-white: #FFFFFF;
-        }
-
-        body {
-            font-family: 'Times New Roman', "Hiragino Mincho ProN", serif;
-            background-color: var(--bg-base);
-            margin: 0; display: flex; justify-content: center; height: 100vh; color: var(--text-main); overflow: hidden;
-        }
-
-        .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; background-color: var(--bg-base); }
-
-        .header { padding: 20px; text-align: center; background: var(--navy-deep); color: var(--gold-accent); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        :root { --bg: #FDFBF7; --navy: #1A2A6C; --gold: #C5A059; --text: #2C3E50; }
+        body { font-family: 'Times New Roman', serif; background: var(--bg); margin: 0; display: flex; justify-content: center; color: var(--text); overflow: hidden; }
+        .app-container { width: 100%; max-width: 480px; display: flex; flex-direction: column; background: var(--bg); height: 100vh; }
+        .header { padding: 20px; text-align: center; background: var(--navy); color: var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         .header h1 { margin: 0; font-size: 20px; letter-spacing: 3px; text-transform: uppercase; }
-
+        
         .main-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
-
-        .card { background: var(--card-white); border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #E8E2D6; }
-        .label { font-size: 10px; color: var(--gold-accent); text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: bold; font-family: sans-serif; }
-        #capturedText { font-size: 16px; line-height: 1.5; min-height: 35px; color: var(--text-main); }
-
+        
         /* 性別トグル */
-        .voice-mode-selector { display: flex; justify-content: center; gap: 15px; margin-bottom: 5px; }
-        .gender-option {
-            font-size: 13px; font-weight: bold; cursor: pointer; padding: 10px 20px; border-radius: 20px;
-            border: 1px solid #ddd; transition: 0.3s; background: #fff;
-        }
-        .gender-option.active { background: var(--navy-deep); color: var(--gold-accent); border-color: var(--navy-deep); }
+        .voice-mode-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 5px; }
+        .gender-option { font-size: 13px; font-weight: bold; cursor: pointer; padding: 10px 20px; border-radius: 20px; border: 1px solid #ddd; background: #fff; transition: 0.3s; }
+        .gender-option.active { background: var(--navy); color: var(--gold); border-color: var(--navy); }
 
         /* 操作ボタン */
-        .controls { display: grid; grid-template-columns: 2fr 1fr; gap: 10px; margin-bottom: 5px; }
-        .mic-btn {
-            padding: 20px; border-radius: 40px; border: none; 
-            background: linear-gradient(135deg, var(--navy-deep), #2a3a7c);
-            color: var(--gold-accent); font-size: 16px; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 5px 10px rgba(26, 42, 108, 0.2);
-        }
-        .mic-btn.active { background: #B21F1F; color: white; animation: pulse 1.5s infinite; }
-        
-        .stop-btn {
-            padding: 20px; border-radius: 40px; border: 2px solid #ddd;
-            background: #fff; color: #333; font-size: 14px; font-weight: bold; cursor: pointer;
-            display: none; align-items: center; justify-content: center;
-        }
+        .controls { display: grid; grid-template-columns: 2fr 1.2fr; gap: 10px; }
+        .mic-btn { padding: 18px; border-radius: 40px; border: none; background: linear-gradient(135deg, var(--navy), #2a3a7c); color: var(--gold); font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 5px 10px rgba(26,42,108,0.2); }
+        .mic-btn.active { background: #B21F1F; color: #fff; animation: pulse 1.5s infinite; }
+        .stop-btn { padding: 18px; border-radius: 40px; border: 2px solid var(--gold); background: #fff; color: var(--navy); font-size: 14px; font-weight: bold; cursor: pointer; display: none; align-items: center; justify-content: center; gap: 5px; }
 
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(178, 31, 31, 0); } 100% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0); } }
 
+        .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #E8E2D6; }
+        .label { font-size: 10px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: bold; font-family: sans-serif; }
+        #capturedText { font-size: 18px; line-height: 1.6; min-height: 60px; color: var(--text); }
+
         .selector-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .lang-btn { padding: 15px 5px; border-radius: 10px; border: 1px solid #D1C7B7; background: #F9F7F2; color: var(--navy-deep); font-weight: bold; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .lang-btn:active { background: var(--gold-accent); color: white; }
+        .lang-btn { padding: 15px 5px; border-radius: 10px; border: 1px solid #D1C7B7; background: #F9F7F2; color: var(--navy); font-weight: bold; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .lang-btn:active { background: var(--gold); color: white; }
         .lang-btn span { font-size: 24px; }
 
-        .result-card { border-top: 3px solid var(--gold-accent); flex-grow: 1; display: flex; flex-direction: column; min-height: 120px; }
-        #translatedDisplay { font-size: 20px; font-weight: 600; color: var(--navy-deep); line-height: 1.4; flex-grow: 1; overflow-y: auto; }
+        .result-card { border-top: 3px solid var(--gold); flex-grow: 1; display: flex; flex-direction: column; min-height: 150px; }
+        #translatedDisplay { font-size: 22px; font-weight: 600; color: var(--navy); line-height: 1.4; flex-grow: 1; overflow-y: auto; }
         .footer-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; border-top: 1px solid #F0EAE0; padding-top: 10px; }
-        .audio-btn { background: var(--gold-accent); color: white; border: none; padding: 10px 25px; border-radius: 40px; font-weight: bold; font-size: 13px; }
+        .audio-btn { background: var(--gold); color: #fff; border: none; padding: 12px 30px; border-radius: 40px; font-weight: bold; cursor: pointer; }
         .status-text { font-size: 10px; color: #A09686; }
     </style>
 </head>
 <body>
-
 <div class="app-container">
     <div class="header"><h1>GLOBAL CONNECT</h1></div>
     <div class="main-content">
-        <!-- 性別選択 -->
         <div class="voice-mode-selector">
             <div id="maleOpt" class="gender-option active" onclick="setGender('male')">👨 男性</div>
             <div id="femaleOpt" class="gender-option" onclick="setGender('female')">👩 女性</div>
         </div>
 
-        <!-- 操作ボタン -->
         <div class="controls">
             <button id="micBtn" class="mic-btn">🎙️ <span id="micText">SPEAK</span></button>
             <button id="stopBtn" class="stop-btn">🛑 STOP</button>
         </div>
 
-        <div class="card"><span class="label">Input</span><div id="capturedText">....</div></div>
+        <div class="card"><span class="label">Input (Real-time)</span><div id="capturedText">....</div></div>
 
         <div class="card">
             <span class="label">Translate to</span>
@@ -100,7 +71,7 @@
             <span class="label">Translation</span>
             <div id="translatedDisplay">....</div>
             <div class="footer-actions">
-                <span id="statusBadge" class="status-text">STANDBY</span>
+                <span id="statusBadge" class="status-text">SYSTEM READY</span>
                 <button class="audio-btn" onclick="repeatVoice()">🔊 REPLAY</button>
             </div>
         </div>
@@ -108,19 +79,13 @@
 </div>
 
 <script>
-    // URL設定済み
     const GAS_URL = "https://script.google.com/macros/s/AKfycby_T8EAdI7du4c7GwRnVZcHUh2yje_j5Cp79C8XGtPqSw7GpTKTfA0oLJ6TK8TbGesiZQ/exec";
-
     const micBtn = document.getElementById('micBtn');
     const stopBtn = document.getElementById('stopBtn');
-    const micText = document.getElementById('micText');
     const capturedText = document.getElementById('capturedText');
     const translatedDisplay = document.getElementById('translatedDisplay');
     const statusBadge = document.getElementById('statusBadge');
-
-    let lastTranslatedText = "";
-    let lastLang = "";
-    let selectedGender = 'male';
+    let lastTranslatedText = "", lastLang = "", selectedGender = 'male';
     let recognition;
 
     function setGender(gender) {
@@ -132,8 +97,8 @@
     if (window.webkitSpeechRecognition || window.SpeechRecognition) {
         const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
         recognition = new SpeechRecognition();
-        recognition.interimResults = true;
-        recognition.continuous = true;
+        recognition.interimResults = true; // 話している途中も表示
+        recognition.continuous = true;    // ストップを押すまで聞き続ける
 
         recognition.onresult = (event) => {
             let finalTranscript = '';
@@ -146,7 +111,7 @@
         recognition.onend = () => {
             micBtn.classList.remove('active');
             stopBtn.style.display = "none";
-            micText.innerText = "SPEAK";
+            document.getElementById('micText').innerText = "SPEAK";
         };
     }
 
@@ -156,7 +121,7 @@
             recognition.start();
             micBtn.classList.add('active');
             stopBtn.style.display = "flex";
-            micText.innerText = "LISTENING...";
+            document.getElementById('micText').innerText = "LISTENING...";
             statusBadge.innerText = "ACTIVE";
         } catch (e) { console.error(e); }
     };
@@ -166,19 +131,13 @@
         statusBadge.innerText = "CAPTURED";
     };
 
-    async function requestTranslation(targetLang) {
+    function requestTranslation(targetLang) {
         const text = capturedText.innerText;
         if (!text || text === "....") return;
-
         statusBadge.innerText = "CONNECTING...";
         translatedDisplay.style.opacity = "0.4";
-
-        const url = `${GAS_URL}?text=${encodeURIComponent(text)}&target=${targetLang}`;
         
-        // JSONP方式で呼び出し（ネットワークエラー回避の最終手段）
-        const script = document.createElement('script');
-        const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-        
+        const callbackName = 'cb_' + Math.round(100000 * Math.random());
         window[callbackName] = function(data) {
             lastTranslatedText = data.result;
             lastLang = targetLang;
@@ -190,7 +149,8 @@
             document.body.removeChild(script);
         };
 
-        script.src = `${url}&callback=${callbackName}`;
+        const script = document.createElement('script');
+        script.src = `${GAS_URL}?text=${encodeURIComponent(text)}&target=${targetLang}&callback=${callbackName}`;
         document.body.appendChild(script);
     }
 
@@ -204,18 +164,12 @@
         const voice = voices.find(v => {
             const isLang = v.lang.startsWith(uttr.lang.split('-')[0]);
             const name = v.name.toLowerCase();
-            if (selectedGender === 'female') {
-                return isLang && (name.includes('female') || name.includes('woman') || name.includes('girl') || name.includes('kyoko'));
-            } else {
-                return isLang && (name.includes('male') || name.includes('man') || name.includes('boy'));
-            }
+            return selectedGender === 'female' ? (isLang && (name.includes('female') || name.includes('woman') || name.includes('girl') || name.includes('kyoko'))) : (isLang && (name.includes('male') || name.includes('man') || name.includes('boy')));
         });
-
         if (voice) uttr.voice = voice;
         uttr.rate = 0.92;
         window.speechSynthesis.speak(uttr);
     }
-
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 </script>
 </body>
