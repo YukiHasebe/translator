@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Global Connect - Privilege Edition v3</title>
+    <title>Global Connect - Privilege Edition</title>
     <style>
         :root {
             --bg-base: #FDFBF7;
@@ -68,10 +68,8 @@
             font-family: sans-serif;
         }
 
-        /* 認識テキスト */
         #capturedText { font-size: 16px; line-height: 1.5; min-height: 35px; color: var(--text-main); }
 
-        /* 性別選択スイッチ（追加） */
         .voice-mode-selector {
             display: flex;
             justify-content: center;
@@ -95,7 +93,6 @@
             border-color: var(--navy-deep);
         }
 
-        /* メイン操作ボタン */
         .mic-btn {
             width: 100%;
             padding: 18px;
@@ -120,7 +117,6 @@
             100% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0); }
         }
 
-        /* 言語選択 */
         .selector-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .lang-btn {
             padding: 15px 5px;
@@ -138,7 +134,6 @@
         .lang-btn:active { background: var(--gold-accent); color: white; }
         .lang-btn span { font-size: 24px; }
 
-        /* 翻訳結果 */
         .result-card { border-top: 3px solid var(--gold-accent); flex-grow: 1; display: flex; flex-direction: column; min-height: 120px; }
         #translatedDisplay { font-size: 20px; font-weight: 600; color: var(--navy-deep); line-height: 1.4; flex-grow: 1; overflow-y: auto; }
 
@@ -157,7 +152,6 @@
     </div>
 
     <div class="main-content">
-        <!-- 1. 性別選択（新機能） -->
         <div class="voice-mode-selector">
             <div id="maleOpt" class="gender-option active" onclick="setGender('male')">👨 男性（Male）</div>
             <div id="femaleOpt" class="gender-option" onclick="setGender('female')">👩 女性（Female）</div>
@@ -193,6 +187,7 @@
 </div>
 
 <script>
+    // あなたの最新URLを設定済みです
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxZlZnpfQ4-jKYq1HfqwxxRo5FlQIZGHYu5fg7Ye6cn6x3FtjtVJ0ptxBofVCqzfje3Bw/exec";
 
     const micBtn = document.getElementById('micBtn');
@@ -203,16 +198,14 @@
 
     let lastTranslatedText = "";
     let lastLang = "";
-    let selectedGender = 'male'; // 初期値は男性（社長用）
+    let selectedGender = 'male';
 
-    // 性別設定
     function setGender(gender) {
         selectedGender = gender;
         document.getElementById('maleOpt').classList.toggle('active', gender === 'male');
         document.getElementById('femaleOpt').classList.toggle('active', gender === 'female');
     }
 
-    // 音声認識
     const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.interimResults = true;
@@ -240,18 +233,34 @@
         if (!text || text === "....") return;
 
         statusBadge.innerText = "CONNECTING...";
+        translatedDisplay.style.opacity = "0.4";
+
+        const url = `${GAS_URL}?text=${encodeURIComponent(text)}&target=${targetLang}`;
+        
         try {
-            const res = await fetch(`${GAS_URL}?text=${encodeURIComponent(text)}&target=${targetLang}`);
-            const data = await res.json();
+            // セキュリティ設定を追加した最新のfetch
+            const response = await fetch(url, {
+                method: 'GET',
+                mode: 'cors'
+            });
+            
+            const data = await response.json();
+            
             lastTranslatedText = data.result;
             lastLang = targetLang;
+            
             translatedDisplay.innerText = lastTranslatedText;
-            statusBadge.innerText = "DONE";
+            translatedDisplay.style.opacity = "1";
+            statusBadge.innerText = "COMPLETED";
+            
             repeatVoice();
-        } catch (e) { statusBadge.innerText = "ERROR"; }
+        } catch (e) {
+            console.error(e);
+            statusBadge.innerText = "NETWORK ERROR";
+            translatedDisplay.innerText = "通信エラーが発生しました。GAS側の『新バージョン』としてのデプロイと『全員に公開』設定を再度ご確認ください。";
+        }
     }
 
-    // 音声再生（性別出し分けロジック）
     function repeatVoice() {
         if (!lastTranslatedText) return;
         window.speechSynthesis.cancel();
@@ -259,18 +268,14 @@
         const uttr = new SpeechSynthesisUtterance(lastTranslatedText);
         uttr.lang = (lastLang === 'vi') ? 'vi-VN' : (lastLang === 'ja') ? 'ja-JP' : 'en-US';
         
-        // ブラウザから利用可能な音声リストを取得
         const voices = window.speechSynthesis.getVoices();
-        
-        // 言語と性別に合った音声を探す
-        // 注意：OSやブラウザにより利用可能な声が異なります
         const voice = voices.find(v => {
             const isLang = v.lang.startsWith(uttr.lang.split('-')[0]);
             const name = v.name.toLowerCase();
             if (selectedGender === 'female') {
                 return isLang && (name.includes('female') || name.includes('girl') || name.includes('woman') || name.includes('google') || name.includes('kyoko'));
             } else {
-                return isLang && (name.includes('male') || name.includes('boy') || name.includes('man') || name.includes('nanami') === false);
+                return isLang && (name.includes('male') || name.includes('boy') || name.includes('man'));
             }
         });
 
@@ -279,7 +284,6 @@
         window.speechSynthesis.speak(uttr);
     }
     
-    // 音声リスト読み込み待ち
     window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 </script>
 
