@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Global Connect - Executive Infinite</title>
+    <title>Global Connect - Executive Infinite v5</title>
     <style>
         :root { --bg: #FDFBF7; --navy: #1A2A6C; --gold: #C5A059; --text: #2C3E50; }
         body { font-family: 'Times New Roman', serif; background: var(--bg); margin: 0; display: flex; justify-content: center; color: var(--text); overflow: hidden; }
@@ -13,22 +13,24 @@
         
         .main-content { padding: 15px; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; overflow-y: auto; }
         
-        /* 性別トグル */
         .voice-mode-selector { display: flex; justify-content: center; gap: 10px; margin-bottom: 5px; }
         .gender-option { font-size: 13px; font-weight: bold; cursor: pointer; padding: 10px 20px; border-radius: 20px; border: 1px solid #ddd; background: #fff; transition: 0.3s; }
         .gender-option.active { background: var(--navy); color: var(--gold); border-color: var(--navy); }
 
-        /* 操作ボタン */
         .controls { display: grid; grid-template-columns: 2fr 1.2fr; gap: 10px; }
         .mic-btn { padding: 18px; border-radius: 40px; border: none; background: linear-gradient(135deg, var(--navy), #2a3a7c); color: var(--gold); font-size: 16px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 5px 10px rgba(26,42,108,0.2); }
         .mic-btn.active { background: #B21F1F; color: #fff; animation: pulse 1.5s infinite; }
         .stop-btn { padding: 18px; border-radius: 40px; border: 2px solid var(--gold); background: #fff; color: var(--navy); font-size: 14px; font-weight: bold; cursor: pointer; display: none; align-items: center; justify-content: center; gap: 5px; }
 
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(178, 31, 31, 0); } 100% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0); } }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(178, 31, 31, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(178, 31, 31, 0); }
+        }
 
         .card { background: #fff; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #E8E2D6; }
         .label { font-size: 10px; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; display: block; font-weight: bold; font-family: sans-serif; }
-        #capturedText { font-size: 18px; line-height: 1.6; min-height: 60px; color: var(--text); }
+        #capturedText { font-size: 18px; line-height: 1.6; min-height: 80px; color: var(--text); max-height: 150px; overflow-y: auto; }
 
         .selector-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
         .lang-btn { padding: 15px 5px; border-radius: 10px; border: 1px solid #D1C7B7; background: #F9F7F2; color: var(--navy); font-weight: bold; font-size: 11px; display: flex; flex-direction: column; align-items: center; gap: 5px; }
@@ -56,7 +58,11 @@
             <button id="stopBtn" class="stop-btn">🛑 STOP</button>
         </div>
 
-        <div class="card"><span class="label">Input (Real-time)</span><div id="capturedText">....</div></div>
+        <div class="card">
+            <span class="label">Input (Accumulated)</span>
+            <div id="capturedText">....</div>
+            <button onclick="clearText()" style="font-size:10px; margin-top:10px; background:none; border:1px solid #ccc; border-radius:4px; color:#999; cursor:pointer;">クリア</button>
+        </div>
 
         <div class="card">
             <span class="label">Translate to</span>
@@ -85,8 +91,10 @@
     const capturedText = document.getElementById('capturedText');
     const translatedDisplay = document.getElementById('translatedDisplay');
     const statusBadge = document.getElementById('statusBadge');
+    
     let lastTranslatedText = "", lastLang = "", selectedGender = 'male';
     let recognition;
+    let finalTranscript = ''; // これまでの言葉を貯めておく変数
 
     function setGender(gender) {
         selectedGender = gender;
@@ -94,28 +102,41 @@
         document.getElementById('femaleOpt').classList.toggle('active', gender === 'female');
     }
 
+    function clearText() {
+        finalTranscript = '';
+        capturedText.innerText = '....';
+    }
+
     if (window.webkitSpeechRecognition || window.SpeechRecognition) {
         const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
         recognition = new SpeechRecognition();
-        recognition.interimResults = true; // 話している途中も表示
-        recognition.continuous = true;    // ストップを押すまで聞き続ける
+        recognition.interimResults = true;
+        recognition.continuous = true;
 
         recognition.onresult = (event) => {
-            let finalTranscript = '';
+            let interimTranscript = '';
             for (let i = event.resultIndex; i < event.results.length; ++i) {
-                finalTranscript += event.results[i][0].transcript;
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                } else {
+                    interimTranscript += transcript;
+                }
             }
-            capturedText.innerText = finalTranscript;
+            // 確定した分 ＋ 今話している最中の分 を表示
+            capturedText.innerText = finalTranscript + interimTranscript;
         };
 
         recognition.onend = () => {
-            micBtn.classList.remove('active');
-            stopBtn.style.display = "none";
-            document.getElementById('micText').innerText = "SPEAK";
+            // 勝手に止まっても、もしボタンが「アクティブ」のままなら再開させる
+            if (micBtn.classList.contains('active')) {
+                recognition.start();
+            }
         };
     }
 
     micBtn.onclick = () => {
+        clearText(); // 新しく話し始める時にクリア
         recognition.lang = (lastLang === 'vi') ? 'vi-VN' : (lastLang === 'en') ? 'en-US' : 'ja-JP';
         try {
             recognition.start();
@@ -127,7 +148,10 @@
     };
 
     stopBtn.onclick = () => {
+        micBtn.classList.remove('active');
         recognition.stop();
+        stopBtn.style.display = "none";
+        document.getElementById('micText').innerText = "SPEAK";
         statusBadge.innerText = "CAPTURED";
     };
 
