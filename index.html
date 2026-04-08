@@ -187,8 +187,8 @@
 </div>
 
 <script>
-    // あなたの最新URLを設定済みです
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxZlZnpfQ4-jKYq1HfqwxxRo5FlQIZGHYu5fg7Ye6cn6x3FtjtVJ0ptxBofVCqzfje3Bw/exec";
+    // あなたの最新URLを設定済み
+    const GAS_URL = "https://script.google.com/macros/s/AKfycby_T8EAdI7du4c7GwRnVZcHUh2yje_j5Cp79C8XGtPqSw7GpTKTfA0oLJ6TK8TbGesiZQ/exec";
 
     const micBtn = document.getElementById('micBtn');
     const micText = document.getElementById('micText');
@@ -211,6 +211,7 @@
     recognition.interimResults = true;
 
     micBtn.onclick = () => {
+        // 会話の前後関係から言語を推測
         recognition.lang = (lastLang === 'vi') ? 'vi-VN' : (lastLang === 'en') ? 'en-US' : 'ja-JP';
         try {
             recognition.start();
@@ -238,26 +239,34 @@
         const url = `${GAS_URL}?text=${encodeURIComponent(text)}&target=${targetLang}`;
         
         try {
-            // セキュリティ設定を追加した最新のfetch
+            // Google Apps Script呼び出しの最新設定
             const response = await fetch(url, {
                 method: 'GET',
-                mode: 'cors'
+                mode: 'no-cors' // ブラウザのリダイレクト制限を回避
             });
             
-            const data = await response.json();
+            // no-corsモードでは中身が直接読めないため、
+            // 確実な動作のためにJSONPライクな手法で再試行
+            const script = document.createElement('script');
+            const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
             
-            lastTranslatedText = data.result;
-            lastLang = targetLang;
-            
-            translatedDisplay.innerText = lastTranslatedText;
-            translatedDisplay.style.opacity = "1";
-            statusBadge.innerText = "COMPLETED";
-            
-            repeatVoice();
+            window[callbackName] = function(data) {
+                lastTranslatedText = data.result;
+                lastLang = targetLang;
+                translatedDisplay.innerText = lastTranslatedText;
+                translatedDisplay.style.opacity = "1";
+                statusBadge.innerText = "COMPLETED";
+                repeatVoice();
+                delete window[callbackName];
+                document.body.removeChild(script);
+            };
+
+            script.src = `${url}&callback=${callbackName}`;
+            document.body.appendChild(script);
+
         } catch (e) {
             console.error(e);
             statusBadge.innerText = "NETWORK ERROR";
-            translatedDisplay.innerText = "通信エラーが発生しました。GAS側の『新バージョン』としてのデプロイと『全員に公開』設定を再度ご確認ください。";
         }
     }
 
